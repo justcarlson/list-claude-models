@@ -1,8 +1,16 @@
 #!/usr/bin/env bun
 import Anthropic from "@anthropic-ai/sdk";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+
+// Load .env from script's directory
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const envPath = join(scriptDir, "..", ".env");
+Bun.env.ANTHROPIC_API_KEY ??= (await Bun.file(envPath).text())
+  .match(/ANTHROPIC_API_KEY=(.+)/)?.[1]?.trim();
 
 async function listModels() {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = Bun.env.ANTHROPIC_API_KEY;
 
   if (!apiKey) {
     console.error("Error: ANTHROPIC_API_KEY environment variable is not set");
